@@ -22,9 +22,15 @@ try {
     
     $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE email = ? AND role = ?');
     $stmt->execute([$data['email'], $data['role']]);
-    $user = $stmt->fetch();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    if (!$user || !password_verify($data['password'], $user['mot_de_passe'])) {
+    if (!$user) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Email ou mot de passe incorrect']);
+        exit;
+    }
+    
+    if (!password_verify($data['password'], $user['mot_de_passe'])) {
         http_response_code(401);
         echo json_encode(['success' => false, 'message' => 'Email ou mot de passe incorrect']);
         exit;
@@ -59,6 +65,7 @@ try {
     echo json_encode(['success' => false, 'message' => 'Erreur lors de la connexion']);
 }
 ?>
+
 
 
 
